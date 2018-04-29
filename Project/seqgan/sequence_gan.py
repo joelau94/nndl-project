@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import tensorflow as tf
 import random
 from dataloader import Gen_Data_loader, Dis_dataloader
@@ -190,6 +191,10 @@ def main():
     sess = tf.Session(config=config)
     sess.run(tf.global_variables_initializer())
 
+    saver = tf.train.Saver()
+    if os.path.exists('gan_model'):
+        saver.restore(sess, 'gan_model')
+
     # # First, use the oracle model to provide the positive examples, which are sampled from the oracle data distribution
     # generate_samples(sess, target_lstm, BATCH_SIZE, generated_num, positive_file)
     gen_data_loader.create_batches(positive_file)
@@ -261,6 +266,7 @@ def main():
                     }
                     _ = sess.run(discriminator.train_op, feed)
 
+    saver.save(sess, 'gan_model')
     log.close()
 
 
